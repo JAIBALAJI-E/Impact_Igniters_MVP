@@ -1,0 +1,279 @@
+:root {
+  --primary-color: #646cff;
+  --bg-color: #111;
+  --surface-color: #1a1a1a;
+  --text-color: #eee;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow: hidden;
+  /* Prevent scrolling on full app usually */
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #646cff, #a259ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.nav-btn:hover {
+  color: #fff;
+  background: var(--glass-bg);
+}
+
+.nav-btn.active {
+  color: #fff;
+  background: var(--primary-color);
+  box-shadow: 0 0 15px rgba(100, 108, 255, 0.4);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #1f1f1f 0%, #111 100%);
+}
+
+.view-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Webcam View */
+/* Webcam View */
+.webcam-view {
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.webcam-card {
+  width: 100%;
+  max-width: 1200px;
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  position: relative;
+  aspect-ratio: 16/9;
+}
+
+/* Morse View */
+.morse-view {
+  padding: 2rem;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Avatar View */
+.avatar-view {
+  position: relative;
+}
+
+.avatar-header {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 30px;
+  border-radius: 30px;
+  backdrop-filter: blur(8px);
+}
+
+.highlight {
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+.avatar-canvas-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-controls {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+}
+
+.avatar-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #222;
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.avatar-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.avatar-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.intro-board {
+  max-width: 900px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  padding: 4rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.team-name {
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.project-title {
+  font-size: 3.5rem;
+  background: linear-gradient(135deg, #fff 30%, #aaa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 2rem 0;
+  line-height: 1.2;
+}
+
+.project-overview {
+  font-size: 1.2rem;
+  color: #ccc;
+  line-height: 1.8;
+  max-width: 700px;
+  margin: 0 auto 3rem auto;
+}
+
+.cta-btn {
+  background: linear-gradient(90deg, #646cff, #a259ff);
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(100, 108, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(100, 108, 255, 0.6);
+}
