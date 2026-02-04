@@ -6,7 +6,6 @@ env/
 
 # Data
 backend/dataset/
-*.h5
 
 # Node
 node_modules/
