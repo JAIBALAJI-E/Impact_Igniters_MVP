@@ -56,7 +56,7 @@ export default function MorseInput({ onTextChange }) {
   };
 
   return (
-    <div style={{ marginTop: "10px", width: "100%" }}>
+    <div className="morse-view">
       <h2 style={{ marginBottom: "20px", color: "var(--primary-color)" }}>Morse Code Input</h2>
 
       <div className="morse-container">
