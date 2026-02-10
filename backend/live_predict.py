@@ -3,19 +3,15 @@ import numpy as np
 import tensorflow as tf
 import mediapipe as mp
 
-# =========================
-# LOAD MODEL
-# =========================
+
 model = tf.keras.models.load_model("model/sign_model.h5")
 
-# ⚠️ MUST MATCH TRAINING LABEL ORDER
-LABELS = ["HELLO", "THANK YOU", "YES", "NO"]  # update if needed
+LABELS = ["HELLO", "THANK YOU", "YES", "NO"]  
 
-CONFIDENCE_THRESHOLD = 0.75  # 👈 adjust if needed
+CONFIDENCE_THRESHOLD = 0.75  
 
-# =========================
-# MEDIAPIPE SETUP
-# =========================
+#MEDIAPIPE SETUP
+
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
     static_image_mode=False,
@@ -25,9 +21,8 @@ hands = mp_hands.Hands(
 )
 mp_draw = mp.solutions.drawing_utils
 
-# =========================
-# START WEBCAM
-# =========================
+#webcam
+
 cap = cv2.VideoCapture(0)
 
 print("✅ Running live sign recognition")
@@ -57,7 +52,7 @@ while True:
             class_id = int(np.argmax(prediction))
             confidence = prediction[class_id]
 
-            # ✅ SAFE CHECK
+           
             if confidence >= CONFIDENCE_THRESHOLD and class_id < len(LABELS):
                 prediction_text = LABELS[class_id]
             else:
@@ -81,7 +76,7 @@ while True:
 
     cv2.imshow("Sign Language Recognition", frame)
 
-    # 🔴 STOP ONLY WHEN YOU PRESS ESC
+    
     if cv2.waitKey(1) & 0xFF == 27:
         break
 
