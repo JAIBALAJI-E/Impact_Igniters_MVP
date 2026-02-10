@@ -6,10 +6,14 @@ import mediapipe as mp
 
 model = tf.keras.models.load_model("model/sign_model.h5")
 
+<<<<<<< HEAD
 LABELS = [
     "ABSOLUTE CINEMA", "COME", "FINE", "GO", "HELLO", "HELP", "HERE", "Hello", "LATER", "NO", "OK",
     "OKAY", "PEACE", "PLEASE", "STOP", "THANK YOU", "WATER", "WELCOME", "WHAT", "YES", "YOU"
 ]  
+=======
+LABELS = ["HELLO", "THANK YOU", "YES", "NO"]  
+>>>>>>> ae361e2be083bbf9491a19462e853bfc50e01487
 
 CONFIDENCE_THRESHOLD = 0.75  
 
@@ -41,6 +45,7 @@ while True:
 
     prediction_text = "No sign detected"
 
+<<<<<<< HEAD
     if result.multi_hand_landmarks and result.multi_handedness:
         lh = np.zeros(63)
         rh = np.zeros(63)
@@ -53,6 +58,25 @@ while True:
             
             if hand_label == "Left":
                 lh = np.array(landmarks)
+=======
+    if result.multi_hand_landmarks:
+        hand_landmarks = result.multi_hand_landmarks[0]
+
+        landmarks = []
+        for lm in hand_landmarks.landmark:
+            landmarks.extend([lm.x, lm.y, lm.z])
+
+        if len(landmarks) == 63:
+            data = np.array(landmarks).reshape(1, 63)
+
+            prediction = model.predict(data, verbose=0)[0]
+            class_id = int(np.argmax(prediction))
+            confidence = prediction[class_id]
+
+           
+            if confidence >= CONFIDENCE_THRESHOLD and class_id < len(LABELS):
+                prediction_text = LABELS[class_id]
+>>>>>>> ae361e2be083bbf9491a19462e853bfc50e01487
             else:
                 rh = np.array(landmarks)
 
