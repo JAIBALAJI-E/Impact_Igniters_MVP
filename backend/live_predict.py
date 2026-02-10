@@ -3,31 +3,29 @@ import numpy as np
 import tensorflow as tf
 import mediapipe as mp
 
-# =========================
-# LOAD MODEL
-# =========================
+
 model = tf.keras.models.load_model("model/sign_model.h5")
 
-# ⚠️ MUST MATCH TRAINING LABEL ORDER
-LABELS = ["HELLO", "THANK YOU", "YES", "NO"]  # update if needed
+LABELS = [
+    "ABSOLUTE CINEMA", "COME", "FINE", "GO", "HELLO", "HELP", "HERE", "Hello", "LATER", "NO", "OK",
+    "OKAY", "PEACE", "PLEASE", "STOP", "THANK YOU", "WATER", "WELCOME", "WHAT", "YES", "YOU"
+]  
 
-CONFIDENCE_THRESHOLD = 0.75  # 👈 adjust if needed
+CONFIDENCE_THRESHOLD = 0.75  
 
-# =========================
-# MEDIAPIPE SETUP
-# =========================
+#MEDIAPIPE SETUP
+
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
     static_image_mode=False,
-    max_num_hands=1,
+    max_num_hands=2,
     min_detection_confidence=0.7,
     min_tracking_confidence=0.7
 )
 mp_draw = mp.solutions.drawing_utils
 
-# =========================
-# START WEBCAM
-# =========================
+#webcam
+
 cap = cv2.VideoCapture(0)
 
 print("✅ Running live sign recognition")
@@ -43,31 +41,38 @@ while True:
 
     prediction_text = "No sign detected"
 
-    if result.multi_hand_landmarks:
-        hand_landmarks = result.multi_hand_landmarks[0]
-
-        landmarks = []
-        for lm in hand_landmarks.landmark:
-            landmarks.extend([lm.x, lm.y, lm.z])
-
-        if len(landmarks) == 63:
-            data = np.array(landmarks).reshape(1, 63)
-
-            prediction = model.predict(data, verbose=0)[0]
-            class_id = int(np.argmax(prediction))
-            confidence = prediction[class_id]
-
-            # ✅ SAFE CHECK
-            if confidence >= CONFIDENCE_THRESHOLD and class_id < len(LABELS):
-                prediction_text = LABELS[class_id]
+    if result.multi_hand_landmarks and result.multi_handedness:
+        lh = np.zeros(63)
+        rh = np.zeros(63)
+        
+        for idx, hand_landmarks in enumerate(result.multi_hand_landmarks):
+            hand_label = result.multi_handedness[idx].classification[0].label
+            landmarks = []
+            for lm in hand_landmarks.landmark:
+                landmarks.extend([lm.x, lm.y, lm.z])
+            
+            if hand_label == "Left":
+                lh = np.array(landmarks)
             else:
-                prediction_text = "No sign detected"
+                rh = np.array(landmarks)
 
-        mp_draw.draw_landmarks(
-            frame,
-            hand_landmarks,
-            mp_hands.HAND_CONNECTIONS
-        )
+            mp_draw.draw_landmarks(
+                frame,
+                hand_landmarks,
+                mp_hands.HAND_CONNECTIONS
+            )
+        
+        # Combine to 126 features
+        data = np.concatenate([lh, rh]).reshape(1, 126)
+
+        prediction = model.predict(data, verbose=0)[0]
+        class_id = int(np.argmax(prediction))
+        confidence = prediction[class_id]
+
+        if confidence >= CONFIDENCE_THRESHOLD and class_id < len(LABELS):
+            prediction_text = LABELS[class_id]
+        else:
+            prediction_text = "No sign detected"
 
     cv2.putText(
         frame,
@@ -81,7 +86,7 @@ while True:
 
     cv2.imshow("Sign Language Recognition", frame)
 
-    # 🔴 STOP ONLY WHEN YOU PRESS ESC
+    
     if cv2.waitKey(1) & 0xFF == 27:
         break
 

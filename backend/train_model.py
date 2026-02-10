@@ -3,66 +3,101 @@ import pandas as pd
 import tensorflow as tf
 
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.layers import Dense, Input, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 
 # =========================
-# 1. LOAD DATASET
+# 1. LOAD DATA
 # =========================
-# CSV format:
-# col0 ... col62 -> hand landmarks (x,y,z * 21)
-# last column -> label (gesture name)
+data_path = "dataset/sign_data.csv"
+try:
+    df = pd.read_csv(data_path, header=None) 
+except FileNotFoundError:
+    print(f"[ERROR] Dataset not found at {data_path}")
+    print("   Run 'python utils/collect_data.py' to collect data first.")
+    exit()
 
-data = pd.read_csv("dataset/sign_data.csv")
+# Check if dataset is empty
+if df.empty:
+    print("[ERROR] Dataset is empty.")
+    exit()
 
-X = data.iloc[:, :-1].values   # 63 features
-y = data.iloc[:, -1].values   # labels
+# FIX: Check if first row is header (contains strings instead of floats in feature columns)
+# If the first column of the first row cannot be converted to float, assume it's a header.
+# We also handle scattered headers from concatenation by coercing to numeric and dropping NaNs.
 
-print("✅ Dataset loaded")
-print("Feature shape:", X.shape)
-print("Labels found:", set(y))
+# 1. Separate Features and Labels
+X_raw = df.iloc[:, :126]
+y_raw = df.iloc[:, -1]
+
+# 2. Force Features to Numeric (Coerce errors to NaN)
+print("[INFO] Cleaning dataset...")
+X_numeric = X_raw.apply(pd.to_numeric, errors='coerce')
+
+# 3. Find invalid rows (any NaN in features)
+valid_indices = ~X_numeric.isnull().any(axis=1)
+num_dropped = len(df) - valid_indices.sum()
+
+if num_dropped > 0:
+    print(f"[WARNING] Dropped {num_dropped} invalid rows (likely headers or garbage).")
+
+# 4. Filter Data
+X = X_numeric[valid_indices].values
+y = y_raw[valid_indices].astype(str).values
+
+# Check if dataset is empty after cleaning
+if len(X) == 0:
+    print("[ERROR] Dataset is empty after cleaning.")
+    exit()
+
+print(f"Dataset Shape (Cleaned): {X.shape}")
 
 # =========================
-# 2. LABEL ENCODING
+# 2. PREPROCESS LABELS
 # =========================
-label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(y)
-y_encoded = to_categorical(y_encoded)
+encoder = LabelEncoder()
+y_encoded = encoder.fit_transform(y)
+num_classes = len(np.unique(y_encoded)) # Define num_classes here!
+y_categorical = to_categorical(y_encoded)
 
-num_classes = y_encoded.shape[1]
-print("✅ Number of classes:", num_classes)
+print(f"Dataset Shape: {df.shape}")
+print(f"Classes Detected: {encoder.classes_}")
+print(f"Number of Classes: {num_classes}")
 
 # =========================
-# 3. TRAIN-TEST SPLIT
+# 3. SPLIT DATA
 # =========================
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y_encoded, test_size=0.2, random_state=42
+    X, y_categorical, test_size=0.2, random_state=42
 )
 
 # =========================
-# 4. MODEL DEFINITION (FIXED)
+# 4. DEFINE MODEL
 # =========================
+
 model = Sequential([
-    Input(shape=(63,)),
+    Input(shape=(126,)),
     Dense(128, activation='relu'),
+    Dropout(0.2),
     Dense(64, activation='relu'),
-    Dense(num_classes, activation='softmax')  # 🔥 AUTO-FIXED
+    Dropout(0.2),
+    Dense(num_classes, activation='softmax')  
 ])
 
-# =========================
-# 5. COMPILE MODEL
-# =========================
+
+#COMPILE MODEL
+
 model.compile(
     optimizer='adam',
     loss='categorical_crossentropy',
     metrics=['accuracy']
 )
 
-# =========================
-# 6. TRAIN MODEL
-# =========================
+
+#TRAIN MODEL
+
 model.fit(
     X_train,
     y_train,
@@ -70,10 +105,10 @@ model.fit(
     validation_data=(X_test, y_test)
 )
 
-# =========================
-# 7. SAVE MODEL
-# =========================
+
+#SAVE MODEL
+
 model.save("model/sign_model.h5")
 
-print("✅ Training complete.")
-print("✅ Model saved to backend/model/sign_model.h5")
+print("[INFO] Training complete.")
+print("[INFO] Model saved to backend/model/sign_model.h5")

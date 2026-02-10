@@ -1,0 +1,1 @@
+['ABSOLUTE CINEMA', 'COME', 'FINE', 'GO', 'HELLO', 'HELP', 'HERE', 'Hello', 'LATER', 'NO', 'OK', 'OKAY', 'PEACE', 'PLEASE', 'STOP', 'THANK YOU', 'WATER', 'WELCOME', 'WHAT', 'YES', 'YOU']
